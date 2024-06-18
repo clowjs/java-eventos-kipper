@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.eventokipper.api.domain.coupon.Coupon;
 import com.eventokipper.api.domain.event.Event;
+import com.eventokipper.api.domain.event.EventDetailsDTO;
 import com.eventokipper.api.domain.event.EventRequestDTO;
 import com.eventokipper.api.domain.event.EventResponseDTO;
 import com.eventokipper.api.repositories.EventRepository;
@@ -33,6 +36,9 @@ public class EventService {
 
   @Autowired
   private AddressService addressService;
+
+  @Autowired
+  private CouponService couponService;
 
   @Autowired
   private EventRepository eventRepository;
@@ -128,22 +134,28 @@ public class EventService {
         .stream().toList();
   }
 
-  public EventResponseDTO getEventById(UUID id) {
-    Event event = eventRepository.findById(id).orElse(null);
+  public EventDetailsDTO getEventDetails(UUID eventId) {
+    Event event = eventRepository.findById(eventId)
+        .orElseThrow(() -> new IllegalArgumentException("Event not found"));
 
-    if (event == null) {
-      return null;
-    }
+    List<Coupon> coupons = couponService.consultCoupons(eventId, new Date());
 
-    return new EventResponseDTO(
+    List<EventDetailsDTO.CouponDTO> couponDTOs = coupons.stream()
+        .map(coupon -> new EventDetailsDTO.CouponDTO(
+            coupon.getCode(),
+            coupon.getDiscount(),
+            coupon.getValid()))
+        .collect(Collectors.toList());
+
+    return new EventDetailsDTO(
         event.getId(),
         event.getTitle(),
         event.getDescription(),
         event.getDate(),
         event.getAddress() != null ? event.getAddress().getCity() : "",
         event.getAddress() != null ? event.getAddress().getUf() : "",
-        event.getRemote(),
+        event.getImgUrl(),
         event.getEventUrl(),
-        event.getImgUrl());
+        couponDTOs);
   }
 }

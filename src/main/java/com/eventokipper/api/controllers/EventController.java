@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.eventokipper.api.domain.event.Event;
+import com.eventokipper.api.domain.event.EventDetailsDTO;
 import com.eventokipper.api.domain.event.EventRequestDTO;
 import com.eventokipper.api.domain.event.EventResponseDTO;
 import com.eventokipper.api.service.EventService;
@@ -67,11 +68,10 @@ public class EventController {
     return ResponseEntity.ok(events);
   }
 
-  @GetMapping("/{id}")
-  public ResponseEntity<EventResponseDTO> getEvent(@PathVariable UUID id) {
-    EventResponseDTO event = this.eventService.getEventById(id);
-
-    return ResponseEntity.ok(event);
+  @GetMapping("/{eventId}")
+  public ResponseEntity<EventDetailsDTO> getEventDetails(@PathVariable UUID eventId) {
+    EventDetailsDTO eventDetails = eventService.getEventDetails(eventId);
+    return ResponseEntity.ok(eventDetails);
   }
 
 }

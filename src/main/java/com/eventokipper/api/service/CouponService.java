@@ -1,6 +1,7 @@
 package com.eventokipper.api.service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,5 +34,9 @@ public class CouponService {
     newCoupon.setEvent(event);
 
     return couponRepository.save(newCoupon);
+  }
+
+  public List<Coupon> consultCoupons(UUID eventId, Date currentDate) {
+    return couponRepository.findByEventIdAndValidAfter(eventId, currentDate);
   }
 }
