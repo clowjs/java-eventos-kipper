@@ -32,6 +32,9 @@ public class EventService {
   private AmazonS3 s3Client;
 
   @Autowired
+  private AddressService addressService;
+
+  @Autowired
   private EventRepository eventRepository;
 
   public Event createEvent(EventRequestDTO data) {
@@ -49,6 +52,10 @@ public class EventService {
     newEvent.setRemote(data.remote());
 
     eventRepository.save(newEvent);
+
+    if (!data.remote()) {
+      addressService.createAddress(data, newEvent);
+    }
 
     return newEvent;
   }
@@ -82,8 +89,42 @@ public class EventService {
     Pageable pageable = PageRequest.of(page, size);
     Page<Event> events = eventRepository.findUpcomingEvents(new Date(), pageable);
 
-    return events.map(event -> new EventResponseDTO(event.getId(), event.getTitle(), event.getDescription(),
-        event.getDate(), "", "", event.getRemote(), event.getEventUrl(), event.getImgUrl()))
+    return events.map(event -> new EventResponseDTO(
+        event.getId(),
+        event.getTitle(),
+        event.getDescription(),
+        event.getDate(),
+        event.getAddress() != null ? event.getAddress().getCity() : "",
+        event.getAddress() != null ? event.getAddress().getUf() : "",
+        event.getRemote(),
+        event.getEventUrl(),
+        event.getImgUrl()))
+        .stream().toList();
+  }
+
+  public List<EventResponseDTO> getFilteredEvents(int page, int size, String title, String city, String uf,
+      Date startDate, Date endDate) {
+
+    title = title != null ? title : "";
+    city = city != null ? city : "";
+    uf = uf != null ? uf : "";
+    startDate = startDate != null ? startDate : new Date();
+    endDate = endDate != null ? endDate : new Date(System.currentTimeMillis() + 315569520000L);
+
+    Pageable pageable = PageRequest.of(page, size);
+
+    Page<Event> events = eventRepository.findFilteredEvents(title, city, uf, startDate, endDate, pageable);
+
+    return events.map(event -> new EventResponseDTO(
+        event.getId(),
+        event.getTitle(),
+        event.getDescription(),
+        event.getDate(),
+        event.getAddress() != null ? event.getAddress().getCity() : "",
+        event.getAddress() != null ? event.getAddress().getUf() : "",
+        event.getRemote(),
+        event.getEventUrl(),
+        event.getImgUrl()))
         .stream().toList();
   }
 }

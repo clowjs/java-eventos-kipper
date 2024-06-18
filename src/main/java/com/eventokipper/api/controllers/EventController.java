@@ -1,8 +1,10 @@
 package com.eventokipper.api.controllers;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,4 +49,27 @@ public class EventController {
     return ResponseEntity.ok(events);
   }
 
+  @GetMapping("/filter")
+  public ResponseEntity<List<EventResponseDTO>> getfilteredEvents(
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(required = false) String title,
+      @RequestParam(required = false) String city,
+      @RequestParam(required = false) String uf,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+
+    List<EventResponseDTO> events = this.eventService.getFilteredEvents(page, size, title, city, uf, startDate,
+        endDate);
+
+    return ResponseEntity.ok(events);
+  }
+
 }
+
+// Page<Event> findFilteredEvents(@Param("title") String title,
+// @Param("city") String city,
+// @Param("uf") String uf,
+// @Param("startDate") Date startDate,
+// @Param("endDate") Date endDate,
+// Pageable pageable);
