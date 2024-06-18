@@ -127,4 +127,23 @@ public class EventService {
         event.getImgUrl()))
         .stream().toList();
   }
+
+  public EventResponseDTO getEventById(UUID id) {
+    Event event = eventRepository.findById(id).orElse(null);
+
+    if (event == null) {
+      return null;
+    }
+
+    return new EventResponseDTO(
+        event.getId(),
+        event.getTitle(),
+        event.getDescription(),
+        event.getDate(),
+        event.getAddress() != null ? event.getAddress().getCity() : "",
+        event.getAddress() != null ? event.getAddress().getUf() : "",
+        event.getRemote(),
+        event.getEventUrl(),
+        event.getImgUrl());
+  }
 }

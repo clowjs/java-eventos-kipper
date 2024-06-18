@@ -2,11 +2,13 @@ package com.eventokipper.api.controllers;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -63,6 +65,13 @@ public class EventController {
         endDate);
 
     return ResponseEntity.ok(events);
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<EventResponseDTO> getEvent(@PathVariable UUID id) {
+    EventResponseDTO event = this.eventService.getEventById(id);
+
+    return ResponseEntity.ok(event);
   }
 
 }
