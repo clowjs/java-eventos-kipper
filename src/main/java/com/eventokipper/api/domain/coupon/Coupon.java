@@ -3,8 +3,6 @@ package com.eventokipper.api.domain.coupon;
 import java.util.Date;
 import java.util.UUID;
 
-import com.eventokipper.api.domain.event.Event;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -34,5 +32,5 @@ public class Coupon {
 
   @ManyToOne
   @JoinColumn(name = "event_id")
-  private Event event;
+  private UUID event;
 }
