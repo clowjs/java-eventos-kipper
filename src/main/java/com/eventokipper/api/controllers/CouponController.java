@@ -5,6 +5,9 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,13 +23,11 @@ public class CouponController {
   @Autowired
   private CouponService couponService;
 
-  public ResponseEntity<Coupon> create(@RequestParam("code") String code,
-      @RequestParam("discount") Integer discount,
-      @RequestParam("valid") Date valid,
-      @RequestParam("event_id") UUID event_id) {
-    CouponRequestDTO couponRequestDTO = new CouponRequestDTO(code, discount, valid, event_id);
-    Coupon newCoupon = this.couponService.createCoupon(couponRequestDTO);
+  @PostMapping("event/{eventId}")
+  public ResponseEntity<Coupon> addCouponsToEvent(@PathVariable UUID eventId,
+      @RequestBody CouponRequestDTO data) {
+    Coupon coupons = couponService.addCouponToEvent(eventId, data);
 
-    return ResponseEntity.ok(newCoupon);
+    return ResponseEntity.ok(coupons);
   }
 }
