@@ -75,10 +75,3 @@ public class EventController {
   }
 
 }
-
-// Page<Event> findFilteredEvents(@Param("title") String title,
-// @Param("city") String city,
-// @Param("uf") String uf,
-// @Param("startDate") Date startDate,
-// @Param("endDate") Date endDate,
-// Pageable pageable);
