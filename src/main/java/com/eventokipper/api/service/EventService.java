@@ -7,6 +7,7 @@ import java.sql.Date;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.amazonaws.services.s3.AmazonS3;
 import com.eventokipper.api.domain.event.Event;
 import com.eventokipper.api.domain.event.EventRequestDTO;
+import com.eventokipper.api.repositories.EventRepository;
 
 @Service
 public class EventService {
@@ -21,7 +23,11 @@ public class EventService {
   @Value("${aws.bucket.name}")
   private String bucketName;
 
+  @Autowired
   private AmazonS3 s3Client;
+
+  @Autowired
+  private EventRepository eventRepository;
 
   public Event createEvent(EventRequestDTO data) {
     String imgUrl = null;
@@ -35,6 +41,9 @@ public class EventService {
     newEvent.setEventUrl(data.eventUrl());
     newEvent.setDate(new Date(data.date()));
     newEvent.setImgUrl(imgUrl);
+    newEvent.setRemote(data.remote());
+
+    eventRepository.save(newEvent);
 
     return newEvent;
   }
@@ -50,7 +59,7 @@ public class EventService {
       return s3Client.getUrl(bucketName, filename).toString();
     } catch (Exception e) {
       System.out.println("Error uploading image to S3");
-      return null;
+      return "";
     }
   }
 
